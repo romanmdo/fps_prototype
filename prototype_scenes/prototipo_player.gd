@@ -8,7 +8,7 @@ extends CharacterBody3D
 
 @export var crouch_speed_multiplier := 0.5
 @export var crouch_height := 1.0
-@export var stand_height := 0.5
+@export var stand_height := 1.8
 @export var crouch_lerp_speed := 8.0
 
 var is_crouching := false
@@ -45,16 +45,17 @@ func _physics_process(delta):
 	if Input.is_action_pressed("move_right"):
 		input_dir += transform.basis.x
 	if Input.is_action_pressed("crouch"):
-		is_crouching = false
-	else: 
 		is_crouching = true
+	else: 
+		is_crouching = false
 
 	# ____ Agacharse (crouch) ____ #
 	var target_height = crouch_height if is_crouching else stand_height
 
 	var capsule = $Collision.shape
 	capsule.height = lerp(capsule.height, target_height, delta * crouch_lerp_speed)
-
+	$Collision.position.y = capsule.height / 2.0
+	
 	var camera_target_y = crouch_height if is_crouching else stand_height
 	$Camera3D.position.y = lerp(
 		$Camera3D.position.y,
