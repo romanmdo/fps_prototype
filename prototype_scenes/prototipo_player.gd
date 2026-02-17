@@ -6,6 +6,13 @@ extends CharacterBody3D
 @export var jump_force := 5.0
 @export var mouse_sensitivity := 0.002
 
+@export var crouch_speed_multiplier := 0.5
+@export var crouch_height := 1.0
+@export var stand_height := 0.5
+@export var crouch_lerp_speed := 8.0
+
+var is_crouching := false
+
 var gravity : float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 func _ready():
@@ -37,11 +44,29 @@ func _physics_process(delta):
 		input_dir -= transform.basis.x
 	if Input.is_action_pressed("move_right"):
 		input_dir += transform.basis.x
-	
+	if Input.is_action_pressed("crouch"):
+		is_crouching = false
+	else: 
+		is_crouching = true
+
+	# ____ Agacharse (crouch) ____ #
+	var target_height = crouch_height if is_crouching else stand_height
+
+	var capsule = $Collision.shape
+	capsule.height = lerp(capsule.height, target_height, delta * crouch_lerp_speed)
+
+	var camera_target_y = crouch_height if is_crouching else stand_height
+	$Camera3D.position.y = lerp(
+		$Camera3D.position.y,
+		camera_target_y,
+		delta * crouch_lerp_speed
+	)
+	# ____ Agacharse (crouch) ____ #
+
 	input_dir = input_dir.normalized()
 	
 	# Movimiento horizontal
-	var wish_speed = max_speed
+	var wish_speed = max_speed * (crouch_speed_multiplier if is_crouching else 1.0)
 	var accel = acceleration if is_on_floor() else acceleration * 0.4
 	
 	# Aplicamos la aceleracion de antes
