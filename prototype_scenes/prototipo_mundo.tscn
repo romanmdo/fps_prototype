@@ -82,6 +82,10 @@ size = Vector3(0.3803711, 0.42565918, 0.4473877)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.60271657, 0.43204606, -0.7904317)
 size = Vector3(1.1799316, 0.77423096, 1.5176392)
 
+[node name="CSGBox3D14" type="CSGBox3D" parent="CSGCombiner3D4" unique_id=349053766]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.92815, 1.1134477, -0.79043174)
+size = Vector3(1.1799316, 0.77423096, 1.5176392)
+
 [node name="CSGBox3D3" type="CSGBox3D" parent="CSGCombiner3D4" unique_id=1878517143]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.60271657, 0.7140132, -2.4625247)
 size = Vector3(1.1799316, 1.3381653, 1.5176392)
@@ -220,7 +224,7 @@ transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -0.0
 polygon = PackedVector2Array(0, 0, 0.009276032, 2.008727, 6.776927, -0.061519623)
 
 [node name="player" parent="." unique_id=1153488686 instance=ExtResource("6_5fid4")]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, -9.191382, 0.8982844, 0)
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, -9.191382, -0.038038194, 0)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1802302548]
 environment = SubResource("Environment_1w3w7")
