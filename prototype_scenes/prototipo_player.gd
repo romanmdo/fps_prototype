@@ -23,8 +23,24 @@ var is_crouching := false
 @export var shoot_range := 100.0
 @export var shoot_damage := 25
 
+# Camara settings
+# Headbob
+@export var headbob_frequency := 7.0
+@export var headbob_amplitude := 0.04
+var headbob_time := 0.0
+
+# Balanceo lateral
+@export var sway_amount := 2.0
+@export var sway_speed := 6.0
+
+# FOV dinamico al correr
+@export var base_fov := 90.0
+@export var run_fov := 97.0
+@export var fov_lerp_speed := 6.0
+
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	$Camera3D.fov = base_fov
 
 func _input(event):
 	if event is InputEventMouseMotion:
@@ -104,6 +120,7 @@ func _physics_process(delta):
 		air_move(input_dir, wish_speed, delta)
 	
 	move_and_slide()
+	apply_camera_effects(delta)
 
 func ground_move(input_dir: Vector3, wish_speed: float, delta: float):
 	# Friccion
@@ -147,12 +164,38 @@ func air_move(input_dir: Vector3, wish_speed: float, delta: float):
 
 	velocity += accel_speed * input_dir
 
+func apply_camera_effects(delta):
+	var horizontal_speed = Vector2(velocity.x, velocity.z).length()
+	var target_height = crouch_height if is_crouching else stand_height
+	
+	# HEADBOB
+	if is_on_floor() and horizontal_speed > 0.2:
+		headbob_time += delta * headbob_frequency * horizontal_speed
+		var bob_offset = sin(headbob_time) * headbob_amplitude
+		$Camera3D.position.y = lerp($Camera3D.position.y, target_height + bob_offset, delta * 10)
+	else:
+		headbob_time = 0.0
+		$Camera3D.position.y = lerp($Camera3D.position.y, target_height, delta * 10)
+	
+	# Balanceo lateral (roll)
+	var input_axis = Input.get_axis("move_left", "move_right")
+	var target_roll = -input_axis * sway_amount
+	$Camera3D.rotation_degrees.z = lerp(
+		$Camera3D.rotation_degrees.z,
+		target_roll,
+		sway_speed * delta
+	)
+
+	# FOV Dinamico
+	var target_fov = run_fov if horizontal_speed > max_speed * 0.8 else base_fov
+	$Camera3D.fov = lerp($Camera3D.fov, target_fov, fov_lerp_speed * delta)
+
 func shoot():
 	var space_state = get_world_3d().direct_space_state
 	
 	var from = $Camera3D.global_transform.origin
 	var to = from + $Camera3D.global_transform.basis.z * -shoot_range
-	$Camera3D.rotate_x(deg_to_rad(-1.5))
+	$Camera3D.rotate_x(deg_to_rad(0.5))
 
 	var query = PhysicsRayQueryParameters3D.create(from, to)
 	query.exclude = [self]
